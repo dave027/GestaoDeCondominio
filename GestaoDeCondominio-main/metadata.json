@@ -1,0 +1,6 @@
+{
+  "name": "Condo SaaS",
+  "description": "Plataforma de gestão condominial com foco em mobile-first, design system e UX/UI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

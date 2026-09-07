@@ -1,0 +1,1225 @@
+# Prompt de atualização do produto — Módulos do MVP condominial
+
+Você é um **Product Designer, UX/UI Designer, arquiteto de informação e desenvolvedor de interfaces SaaS mobile-first**. Sua tarefa é atualizar o design e a estrutura inicial da aplicação condominial existente, mantendo consistência com as diretrizes em `condo-saas-design-guidelines.md`.
+
+O objetivo é ajustar o produto para um MVP focado em comunicação, participação dos moradores, transparência, gestão financeira e governança. Você deve:
+
+1. manter ativos somente os módulos aprovados abaixo;
+
+1. desativar visualmente e funcionalmente os módulos que não serão utilizados agora;
+
+1. criar as páginas, estados, fluxos e componentes que ainda não existem;
+
+1. preservar o padrão mobile-first e garantir responsividade em tablet e computador;
+
+1. evitar telas genéricas, páginas vazias ou funcionalidades falsas;
+
+1. documentar as decisões de arquitetura e as dependências entre módulos.
+
+## Diretrizes obrigatórias
+
+Leia e siga integralmente o arquivo `condo-saas-design-guidelines.md`. Ele é a fonte de verdade para:
+
+- mobile-first;
+
+- responsividade;
+
+- tokens de design;
+
+- acessibilidade WCAG 2.1 AA;
+
+- UX writing em português do Brasil;
+
+- estados de loading, vazio, erro e sucesso;
+
+- permissões;
+
+- componentes;
+
+- critérios de aceite;
+
+- handoff para engenharia.
+
+Não crie uma identidade visual nova. Reutilize os tokens, componentes, espaçamentos, estados, linguagem e padrões já definidos.
+
+## Módulos ativos no MVP
+
+A aplicação deve conter somente os seguintes módulos ativos:
+
+1. **Mural digital de avisos**
+
+1. **Pesquisas de opinião**
+
+1. **Classificados internos**
+
+1. **Financeiro e Cobrança**
+
+1. **Assembleia virtual**
+
+1. **Repositório documental**
+
+1. **Gestão de fornecedores**
+
+1. **Cadastro de moradores**
+
+1. **Hierarquia de acessos**
+
+O sistema pode manter páginas transversais necessárias para login, seleção de condomínio/unidade, perfil, notificações, busca, configurações básicas e suporte, desde que elas não apresentem módulos fora do escopo.
+
+## Módulos temporariamente desativados
+
+Desative, oculte da navegação e impeça acesso às seguintes áreas neste momento:
+
+- Reservas de áreas comuns;
+
+- Portaria digital;
+
+- Autorizações de visitantes;
+
+- Gestão de encomendas;
+
+- Controle operacional;
+
+- Funcionalidades sociais ou de comunidade que não estejam diretamente relacionadas ao mural ou aos classificados;
+
+- Qualquer módulo adicional existente que não esteja listado como ativo.
+
+### Regra de desativação
+
+Não apague dados, componentes ou rotas de forma destrutiva sem confirmar que isso é tecnicamente necessário. Prefira feature flags, permissões de módulo ou configuração de navegação.
+
+Os módulos desativados não devem:
+
+- aparecer no menu principal;
+
+- aparecer em atalhos da tela inicial;
+
+- aparecer em breadcrumbs ou filtros;
+
+- ser sugeridos em empty states;
+
+- gerar notificações;
+
+- aparecer em dashboards;
+
+- ser acessíveis por links internos visíveis;
+
+- aparecer como se estivessem parcialmente disponíveis.
+
+Se existir uma URL direta para um módulo desativado, mostre um estado neutro de **“Módulo indisponível”**, sem expor detalhes técnicos, com a mensagem:
+
+> Este recurso ainda não faz parte da versão atual do sistema.
+
+Não inclua botão para usar o módulo. Se apropriado, permita voltar para o início.
+
+## Navegação final do MVP
+
+### Morador
+
+No mobile, usar navegação inferior ou menu compacto com no máximo cinco destinos principais:
+
+- **Início**;
+
+- **Avisos**;
+
+- Pesquisas de opinião;
+
+- **Financeiro**;
+
+- **Assembleias**;
+
+### Síndico
+
+No mobile, priorizar:
+
+- Início;
+
+- Avisos;
+
+- Pesquisas;
+
+- Assembleias;
+
+- Financeiro;
+
+No desktop, usar navegação lateral responsiva com os módulos ativos agrupados por objetivo, não por estrutura interna:
+
+| Grupo | Módulos |
+| --- | --- |
+| Comunicação | Mural de avisos, Pesquisas de opinião, Classificados |
+| Financeiro | Financeiro e Cobrança |
+| Governança | Assembleia virtual, Repositório documental |
+| Administração | Gestão de fornecedores, Cadastro unificado, Hierarquia de acessos |
+
+### Administradora
+
+Permitir alternância clara entre condomínios. A navegação deve incluir:
+
+- Visão geral;
+
+- Condomínios;
+
+- Mural de avisos;
+
+- Pesquisas;
+
+- Financeiro e Cobrança;
+
+- Assembleias;
+
+- Documentos;
+
+- Fornecedores;
+
+- Cadastro de moradores;
+
+- Hierarquia de acessos;
+
+- Configurações.
+
+A troca de condomínio deve sempre exibir o nome do condomínio ativo e impedir mistura de dados entre condomínios.
+
+## Páginas que devem ser criadas ou concluídas
+
+Crie as telas abaixo para cada perfil aplicável. Para cada tela, implemente versão mobile, tablet e desktop, além de todos os estados relevantes.
+
+---
+
+# 1. Mural digital de avisos
+
+## Objetivo
+
+Centralizar a comunicação oficial do condomínio, reduzindo dependência de canais informais e permitindo rastrear publicação, alcance e leitura.
+
+## Páginas
+
+- Lista do mural;
+
+- Detalhe do aviso;
+
+- Criar aviso;
+
+- Editar aviso;
+
+- Gerenciar avisos publicados;
+
+- Arquivo de avisos;
+
+## Funcionalidades
+
+- Publicar aviso com título, conteúdo, imagens e anexos;
+
+- Definir escopo do aviso;
+
+- Fixar ou destacar aviso;
+
+- Definir data de publicação e expiração;
+
+- Permitir confirmação de leitura;
+
+- Visualizar quantidade e lista de leitores;
+
+- Editar, arquivar ou cancelar aviso conforme permissão;
+
+- Buscar e filtrar avisos;
+
+- Ordenar por mais recentes, fixados e prioritários.
+
+## Componentes e estados
+
+Usar card de aviso com título, resumo, data, autor, escopo, prioridade, anexo e estado lido/não lido.
+
+Criar estados para:
+
+- mural sem avisos;
+
+- carregamento;
+
+- erro de carregamento;
+
+- aviso expirado;
+
+- aviso arquivado;
+
+- aviso urgente;
+
+- aviso com anexo indisponível;
+
+- usuário sem permissão para publicar;
+
+- confirmação de leitura registrada.
+
+## Microcopy
+
+- “Publicar aviso”;
+
+- “Confirmar leitura”;
+
+- “Aviso publicado com sucesso”;
+
+- “Nenhum aviso publicado ainda. Quando houver uma comunicação oficial, ela aparecerá aqui.”
+
+---
+
+# 2. Pesquisas de opinião
+
+## Objetivo
+
+Permitir que síndicos e administradoras consultem moradores de maneira simples, organizada e transparente, sem confundir pesquisa informal com votação oficial de assembleia.
+
+## Páginas
+
+- Lista de pesquisas abertas, futuras e encerradas;
+
+- Detalhe da pesquisa;
+
+- Responder pesquisa;
+
+- Criar pesquisa;
+
+- Editar pesquisa antes da publicação;
+
+- Resultado parcial, quando permitido;
+
+- Resultado final;
+
+- Histórico e exportação de respostas.
+
+## Funcionalidades
+
+- Criar pesquisa com título, contexto, perguntas e opções;
+
+- Usar pergunta de escolha única, múltipla escolha, escala e texto livre;
+
+- Definir período de resposta;
+
+- Permitir ou bloquear alteração da resposta;
+
+- Exibir progresso de preenchimento;
+
+- Encerrar pesquisa;
+
+- Exibir resultados com contagens e percentuais;
+
+- Exportar dados conforme permissão.
+
+## Regra de confiança
+
+Deixar claro que uma pesquisa de opinião não possui necessariamente o mesmo efeito jurídico ou deliberativo de uma assembleia. Exibir essa informação antes da resposta quando houver risco de confusão.
+
+## Estados
+
+- pesquisa aberta;
+
+- resposta já enviada;
+
+- pesquisa encerrada;
+
+- pesquisa com prazo expirado;
+
+- erro ao salvar resposta;
+
+- confirmação de resposta registrada.
+
+## Microcopy
+
+- “Responder pesquisa”;
+
+- “Sua resposta foi registrada”;
+
+- “Esta pesquisa não substitui uma votação formal de assembleia”;
+
+- “Você já respondeu a esta pesquisa”;
+
+- “A pesquisa encerrou em [data]”.
+
+---
+
+# 3. Classificados internos
+
+## Objetivo
+
+Permitir publicação e consulta de anúncios entre moradores, mantendo segurança, moderação e clareza de que a negociação ocorre entre os usuários.
+
+## Páginas
+
+- Lista de classificados;
+
+- Detalhe do anúncio;
+
+- Criar anúncio;
+
+- Editar anúncio;
+
+- Meus anúncios;
+
+- Favoritos, se previsto;
+
+- Moderação e denúncias para síndico ou administradora.
+
+## Categorias iniciais
+
+- Venda;
+
+- Aluguel;
+
+- Doação;
+
+- Serviços;
+
+- Perdidos e encontrados;
+
+- Outros.
+
+## Funcionalidades
+
+- Título, descrição, categoria, preço, fotos e forma de contato;
+
+- Status disponível, reservado, vendido ou encerrado;
+
+- Filtros por categoria, preço e data;
+
+- Marcar anúncio como favorito, se previsto;
+
+- Denunciar anúncio;
+
+- Editar ou encerrar anúncio pelo autor;
+
+- Moderar conteúdo conforme regras do condomínio;
+
+- Exibir aviso de segurança e privacidade.
+
+## Regra de segurança
+
+Não expor dados pessoais além do necessário. Não prometer intermediação, pagamento, entrega ou garantia pelo condomínio. Exibir claramente que a negociação ocorre entre os usuários.
+
+## Estados
+
+- nenhum anúncio;
+
+- carregando;
+
+- sem resultados para o filtro;
+
+- anúncio encerrado;
+
+- anúncio removido por moderação;
+
+- denúncia enviada;
+
+- upload de imagem em andamento;
+
+- erro de publicação;
+
+- anúncio publicado com sucesso.
+
+## Microcopy
+
+- “Publicar anúncio”;
+
+- “Entrar em contato”;
+
+- “Este anúncio é de responsabilidade do anunciante”;
+
+- “Denunciar anúncio”;
+
+- “Ainda não há classificados nesta categoria”.
+
+---
+
+# 4. Financeiro e Cobrança
+
+## Objetivo
+
+Oferecer transparência financeira para moradores e controle operacional para síndicos e administradoras.
+
+## Páginas do morador
+
+- Resumo financeiro da unidade;
+
+- Lista de cobranças;
+
+- Detalhe da cobrança;
+
+- Boleto e segunda via;
+
+- Pix e cópia do código;
+
+- Histórico de pagamentos;
+
+- Acordos ou negociações, se o produto suportar;
+
+- Documentos associados à cobrança.
+
+## Páginas do gestor
+
+- Dashboard financeiro;
+
+- Receitas e despesas;
+
+- Contas a pagar;
+
+- Cobranças em aberto;
+
+- Inadimplência;
+
+- Conciliação;
+
+- Prestação de contas;
+
+- Relatórios;
+
+## Regras de interface
+
+Toda cobrança deve exibir valor, vencimento, competência, unidade, status, forma de pagamento, ações disponíveis e documento relacionado.
+
+Usar os status:
+
+- Pago;
+
+- A vencer;
+
+- Vencido;
+
+- Em processamento;
+
+- Cancelado;
+
+- Em negociação, se aplicável.
+
+No mobile, deixar “Pagar”, “Copiar Pix”, “Copiar linha digitável” e “Baixar boleto” facilmente acessíveis.
+
+## Estados
+
+- nenhuma cobrança;
+
+- pagamento processando;
+
+- pagamento confirmado;
+
+- boleto indisponível;
+
+- Pix expirado;
+
+- unidade inadimplente;
+
+- dados financeiros sem permissão;
+
+- conciliação pendente;
+
+- relatório vazio;
+
+- erro de carregamento.
+
+## Microcopy
+
+- “Copiar Pix”;
+
+- “Código Pix copiado”;
+
+- “Esta cobrança está vencida desde [data]”;
+
+- “Pagamento em processamento. Atualizaremos o status assim que houver confirmação”;
+
+- “Não foi possível carregar o boleto. Tente novamente ou fale com a administradora”.
+
+---
+
+# 5. Assembleia virtual
+
+## Objetivo
+
+Permitir convocação, preparação, participação, votação e consulta de resultados de assembleias virtuais com clareza e rastreabilidade.
+
+## Páginas
+
+- Lista de assembleias;
+
+- Detalhe da assembleia;
+
+- Convocação;
+
+- Pautas;
+
+- Documentos da assembleia;
+
+- Sala virtual ou área de participação;
+
+- Votação por pauta;
+
+- Confirmação do voto;
+
+- Resultado e quórum;
+
+- Ata e histórico;
+
+- Criar e gerenciar assembleia para gestores.
+
+## Funcionalidades
+
+- Título, data, horário, status e instruções;
+
+- Convocação e documentos anexos;
+
+- Lista de pautas;
+
+- Prazo de votação;
+
+- Indicador de quórum;
+
+- Voto por pauta;
+
+- Confirmação antes do envio;
+
+- Recibo do voto;
+
+- Resultado por pauta;
+
+- Histórico e ata;
+
+- Permissões por unidade e representante.
+
+## Regra de confiança
+
+Diferenciar visualmente assembleia oficial, pesquisa de opinião e comunicação. Não usar o componente de pesquisa para simular uma assembleia. Exibir claramente se o voto é aberto, secreto, identificável ou sujeito a regras configuráveis.
+
+## Estados
+
+- assembleia futura;
+
+- assembleia em andamento;
+
+- votação aberta;
+
+- votação encerrada;
+
+- usuário sem direito de voto;
+
+- voto já registrado;
+
+- quórum insuficiente;
+
+- erro ao registrar voto;
+
+- confirmação de voto;
+
+- resultado publicado;
+
+- ata disponível.
+
+## Microcopy
+
+- “Votar nesta pauta”;
+
+- “Seu voto será registrado para esta unidade”;
+
+- “Confirmar voto”;
+
+- “Seu voto foi registrado com sucesso”;
+
+- “A votação encerrou às [hora]”;
+
+- “Você não tem permissão para votar nesta pauta”.
+
+---
+
+# 6. Repositório documental
+
+## Objetivo
+
+Organizar e publicar documentos oficiais para consulta simples, com controle de versões, categorias e permissões.
+
+## Páginas
+
+- Biblioteca de documentos;
+
+- Busca documental;
+
+- Categorias;
+
+- Detalhe do documento;
+
+- Visualizador ou download;
+
+- Upload de documento;
+
+- Editar metadados;
+
+- Histórico de versões;
+
+- Controle de visibilidade;
+
+- Documentos vinculados a aviso, assembleia, cobrança ou fornecedor.
+
+## Categorias iniciais
+
+- Atas;
+
+- Convenção;
+
+- Regimento interno;
+
+- Prestação de contas;
+
+- Contratos;
+
+- Orçamentos;
+
+- Comunicados oficiais;
+
+- Documentos de fornecedores;
+
+- Outros.
+
+## Funcionalidades
+
+- Upload de PDF e formatos permitidos;
+
+- Título, categoria, competência, descrição e data;
+
+- Visibilidade por condomínio, bloco, unidade ou perfil;
+
+- Busca por nome e categoria;
+
+- Filtros;
+
+- Pré-visualização;
+
+- Download;
+
+- Histórico de versões;
+
+- Arquivamento sem exclusão destrutiva;
+
+- Registro de quem publicou e quando.
+
+## Estados
+
+- repositório vazio;
+
+- categoria vazia;
+
+- upload em andamento;
+
+- formato não permitido;
+
+- arquivo muito grande;
+
+- documento indisponível;
+
+- documento arquivado;
+
+- nova versão disponível;
+
+- sem permissão;
+
+- erro de visualização.
+
+## Microcopy
+
+- “Adicionar documento”;
+
+- “Visualizar documento”;
+
+- “Baixar documento”;
+
+- “Este documento foi arquivado e não está mais vigente”;
+
+- “Nenhum documento foi publicado nesta categoria”.
+
+---
+
+# 7. Gestão de fornecedores
+
+## Objetivo
+
+Centralizar dados, contratos, documentos, status e histórico de fornecedores relacionados ao condomínio.
+
+## Páginas
+
+- Lista de fornecedores;
+
+- Detalhe do fornecedor;
+
+- Cadastro de fornecedor;
+
+- Editar fornecedor;
+
+- Contratos e documentos;
+
+- Serviços prestados;
+
+- Histórico de relacionamento;
+
+- Status e avaliação interna;
+
+- Fornecedores ativos, inativos e em análise.
+
+## Dados mínimos
+
+- Razão social ou nome comercial;
+
+- CNPJ ou identificador, conforme permissão;
+
+- Categoria de serviço;
+
+- Contatos;
+
+- Responsável;
+
+- Status;
+
+- Contratos;
+
+- Vigência;
+
+- Documentos;
+
+- Observações;
+
+- Condomínios relacionados.
+
+## Funcionalidades
+
+- Buscar e filtrar fornecedores;
+
+- Criar e editar cadastro;
+
+- Associar contrato e documentos;
+
+- Controlar vigência;
+
+- Alertar sobre vencimento próximo;
+
+- Alterar status;
+
+- Registrar histórico;
+
+- Restringir dados sensíveis por hierarquia de acesso.
+
+## Estados
+
+- nenhum fornecedor;
+
+- fornecedor ativo;
+
+- fornecedor inativo;
+
+- fornecedor em análise;
+
+- contrato próximo do vencimento;
+
+- documento pendente;
+
+- cadastro incompleto;
+
+- duplicidade potencial;
+
+- erro ao salvar.
+
+## Microcopy
+
+- “Cadastrar fornecedor”;
+
+- “Contrato vence em [data]”;
+
+- “Este cadastro possui campos obrigatórios pendentes”;
+
+- “Fornecedor arquivado”;
+
+- “Os dados deste fornecedor são visíveis somente para perfis autorizados”.
+
+---
+
+# 8. Cadastro unificado
+
+## Objetivo
+
+Criar uma fonte única e consistente de dados de condomínios, unidades, moradores, responsáveis e vínculos.
+
+## Páginas
+
+- Lista de condomínios;
+
+- Detalhe do condomínio;
+
+- Lista de unidades;
+
+- Detalhe da unidade;
+
+- Lista de pessoas;
+
+- Perfil da pessoa;
+
+- Vínculos entre pessoa, unidade e condomínio;
+
+- Importação de cadastro;
+
+- Duplicidades e inconsistências;
+
+- Histórico de alterações.
+
+## Entidades
+
+- Condomínio;
+
+- Bloco ou torre;
+
+- Unidade;
+
+- Proprietário;
+
+- Morador;
+
+- Inquilino;
+
+- Responsável financeiro;
+
+- Representante;
+
+- Funcionário ou prestador, quando aplicável.
+
+## Funcionalidades
+
+- Buscar pessoas e unidades;
+
+- Criar, editar e inativar registros;
+
+- Associar uma pessoa a uma ou mais unidades;
+
+- Definir tipo de vínculo;
+
+- Validar campos obrigatórios;
+
+- Sinalizar duplicidades;
+
+- Importar dados com pré-visualização e relatório de erros;
+
+- Exibir histórico e auditoria;
+
+- Restringir informações sensíveis.
+
+## Regra de privacidade
+
+Exibir somente os dados necessários para o perfil atual. Não expor telefone, documento pessoal, e-mail ou informações financeiras sem permissão adequada.
+
+## Estados
+
+- cadastro vazio;
+
+- registro incompleto;
+
+- possível duplicidade;
+
+- importação em andamento;
+
+- importação concluída;
+
+- linhas com erro;
+
+- pessoa sem vínculo;
+
+- unidade sem responsável;
+
+- erro de validação;
+
+- alteração registrada.
+
+## Microcopy
+
+- “Adicionar pessoa”;
+
+- “Adicionar unidade”;
+
+- “Este registro possui dados semelhantes a outro cadastro”;
+
+- “A importação foi concluída com [n] erros para revisão”;
+
+- “Alteração registrada no histórico”.
+
+---
+
+# 9. Hierarquia de acessos
+
+## Objetivo
+
+Controlar quais pessoas podem visualizar, criar, editar, aprovar, publicar, exportar ou administrar dados dentro de cada condomínio.
+
+## Páginas
+
+- Lista de perfis de acesso;
+
+- Detalhe do perfil;
+
+- Criar perfil;
+
+- Editar permissões;
+
+- Lista de usuários e seus perfis;
+
+- Concessão de acesso;
+
+- Revogação de acesso;
+
+- Histórico de alterações;
+
+- Visualização do que cada perfil pode fazer.
+
+## Perfis iniciais sugeridos
+
+- Morador;
+
+- Síndico;
+
+- Subsíndico;
+
+- Conselho;
+
+- Administradora;
+
+- Operador financeiro;
+
+- Moderador;
+
+- Portaria, somente se alguma funcionalidade futura for reativada.
+
+Não exiba perfis relacionados a módulos desativados como se estivessem disponíveis para uso no MVP.
+
+## Permissões por ação
+
+Diferenciar pelo menos:
+
+- visualizar;
+
+- criar;
+
+- editar;
+
+- publicar;
+
+- aprovar;
+
+- votar;
+
+- exportar;
+
+- arquivar;
+
+- administrar permissões.
+
+Aplicar permissões por:
+
+- condomínio;
+
+- bloco;
+
+- unidade;
+
+- módulo;
+
+- tipo de dado;
+
+- ação.
+
+## Regras de segurança e confirmação
+
+Ações sensíveis devem exigir confirmação e registrar auditoria. Ao remover acesso, informar quais módulos deixarão de estar disponíveis. Não permitir que um usuário conceda uma permissão superior à sua própria sem uma regra explícita de administração.
+
+## Estados
+
+- usuário sem acesso;
+
+- perfil sem permissões;
+
+- permissão herdada;
+
+- permissão personalizada;
+
+- acesso expirado;
+
+- convite pendente;
+
+- revogação concluída;
+
+- erro ao salvar;
+
+- alteração registrada.
+
+## Microcopy
+
+- “Conceder acesso”;
+
+- “Revogar acesso”;
+
+- “Este usuário poderá visualizar e editar os módulos selecionados”;
+
+- “A alteração será registrada no histórico de segurança”;
+
+- “Você não pode conceder uma permissão superior à sua”.
+
+## Integração entre módulos
+
+A IA deve modelar as relações abaixo:
+
+| Origem | Relação | Destino |
+| --- | --- | --- |
+| Mural de avisos | pode anexar | Documento |
+| Pesquisa | pode ser divulgada por | Aviso |
+| Assembleia | possui | Pautas, votos, documentos e resultados |
+| Cobrança | pode apontar para | Documento financeiro |
+| Fornecedor | possui | Contratos e documentos |
+| Unidade | pertence a | Condomínio |
+| Pessoa | possui vínculo com | Unidade e condomínio |
+| Perfil de acesso | controla | Pessoa, módulo e ação |
+| Classificado | é publicado por | Pessoa vinculada ao condomínio |
+
+Não crie dependências com Reservas, Chamados, Portaria, Encomendas ou Manutenções, pois esses módulos estão desativados no MVP.
+
+## Dashboard inicial
+
+Atualize o dashboard de cada perfil para exibir apenas informações dos módulos ativos.
+
+### Dashboard do morador
+
+Exibir:
+
+- avisos não lidos;
+
+- próxima assembleia;
+
+- pesquisas abertas;
+
+- cobrança em aberto;
+
+- atalho para copiar Pix;
+
+- documentos recentes;
+
+- classificados recentes, se o perfil tiver acesso.
+
+Não exibir reservas, chamados, encomendas, portaria ou manutenção.
+
+### Dashboard do síndico
+
+Exibir:
+
+- avisos pendentes ou recentes;
+
+- pesquisas abertas;
+
+- assembleias em preparação ou andamento;
+
+- resumo financeiro;
+
+- documentos aguardando publicação;
+
+- contratos de fornecedores próximos do vencimento;
+
+- cadastros incompletos;
+
+- alertas de permissões ou acessos.
+
+### Dashboard da administradora
+
+Exibir:
+
+- resumo por condomínio;
+
+- pendências financeiras;
+
+- assembleias próximas;
+
+- documentos pendentes;
+
+- fornecedores com contratos próximos do vencimento;
+
+- inconsistências cadastrais;
+
+- alterações recentes de acesso;
+
+- filtros por condomínio.
+
+## Critérios de aceite
+
+Considere o trabalho concluído somente quando:
+
+- os nove módulos ativos estiverem acessíveis a partir da navegação correta;
+
+- os módulos desativados não aparecerem na navegação, dashboards, busca ou notificações;
+
+- rotas diretas para módulos desativados exibirem o estado de indisponibilidade;
+
+- cada módulo ativo possuir lista, detalhe, criação ou edição quando aplicável;
+
+- todas as páginas possuírem estados de carregamento, vazio, erro, sucesso e sem permissão;
+
+- cada perfil visualizar somente os módulos e ações autorizados;
+
+- a troca de condomínio estiver explícita e não misturar dados;
+
+- o dashboard não contenha cards de módulos desativados;
+
+- todas as ações principais funcionarem em uma tela mobile de 320 px a 390 px;
+
+- as telas se expandirem de forma responsiva em tablet e desktop;
+
+- não houver necessidade de hover para concluir tarefas essenciais;
+
+- alvos de toque tenham no mínimo 44 × 44 px;
+
+- status sejam comunicados por texto e não somente por cor;
+
+- operações financeiras, votos, alterações de acesso e publicações tenham confirmação e histórico;
+
+- documentos e fornecedores tenham controle de visibilidade e permissões;
+
+- cadastro unificado e hierarquia de acessos tenham auditoria;
+
+- UX writing use português do Brasil e o glossário condominial;
+
+- nenhuma regra variável por condomínio seja apresentada como universal.
+
+## Entrega esperada da outra IA
+
+Entregue o resultado nas seguintes seções:
+
+1. diagnóstico da aplicação atual;
+
+1. lista de módulos mantidos;
+
+1. lista de módulos desativados;
+
+1. mapa de navegação atualizado;
+
+1. arquitetura de informação;
+
+1. permissões por perfil;
+
+1. páginas criadas ou alteradas;
+
+1. fluxos principais;
+
+1. componentes novos ou reutilizados;
+
+1. estados de interface;
+
+1. regras mobile-first;
+
+1. comportamento em tablet e desktop;
+
+1. critérios de aceite verificados;
+
+1. decisões e assunções;
+
+1. pendências para implementação.
+
+Se estiver trabalhando em um projeto de código, aplique as alterações diretamente na estrutura existente sem destruir dados. Antes de alterar arquivos, identifique as rotas e componentes atuais. Ao final, informe quais arquivos foram modificados, quais módulos foram desativados e como validar cada página.
+
+Se estiver produzindo apenas design, entregue wireframes textuais detalhados ou especificações de tela para cada página, incluindo hierarquia, componentes, microcopy, estados, permissões e comportamento responsivo.
+
+Finalize respondendo:
+
+> O usuário consegue acessar todos os nove módulos ativos pelo celular, sem encontrar funcionalidades fora do escopo e sem confundir pesquisa, assembleia, aviso ou documento?
+
+Se a resposta for não, corrija o design antes de finalizar.
+
