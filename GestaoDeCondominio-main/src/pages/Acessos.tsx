@@ -1,6 +1,9 @@
 import { motion } from 'motion/react';
 import { Card, Button } from '../components/ui';
-import { Shield, Lock, Check, ShieldCheck, KeyRound } from 'lucide-react';
+import { Modal } from '../components/Modal';
+import { useToast } from '../components/Toast';
+import { Shield, Check, KeyRound, Lock } from 'lucide-react';
+import { useState } from 'react';
 
 interface RoleProfile {
   id: string;
@@ -9,6 +12,23 @@ interface RoleProfile {
   usersCount: number;
   permissions: string[];
 }
+
+const ALL_AVAILABLE_PERMISSIONS = [
+  'Visualizar avisos e confirmar leitura',
+  'Publicar, editar e fixar comunicados oficiais no mural',
+  'Votar em pesquisas de opinião',
+  'Criar pesquisas de opinião e exportar resultados',
+  'Publicar e responder em classificados',
+  'Visualizar boletos e extratos da sua unidade',
+  'Emissão e baixa de boletos condominiais',
+  'Publicar balancetes e demonstrativos fiscais',
+  'Participar e votar em assembleias virtuais',
+  'Convocar assembleias e cadastrar pautas',
+  'Consultar documentos públicos (convenção, atas)',
+  'Upload e arquivamento de documentos oficiais',
+  'Cadastrar e gerenciar contratos de fornecedores',
+  'Acessar e editar cadastro de moradores e unidades'
+];
 
 const MOCK_PROFILES: RoleProfile[] = [
   {
@@ -31,10 +51,17 @@ const MOCK_PROFILES: RoleProfile[] = [
     description: 'Gestão completa operacional, comunicação oficial e condução de assembleias no condomínio.',
     usersCount: 2,
     permissions: [
-      'Todas as permissões de Morador',
+      'Visualizar avisos e confirmar leitura',
       'Publicar, editar e fixar comunicados oficiais no mural',
+      'Votar em pesquisas de opinião',
       'Criar pesquisas de opinião e exportar resultados',
+      'Publicar e responder em classificados',
+      'Visualizar boletos e extratos da sua unidade',
+      'Publicar balancetes e demonstrativos fiscais',
+      'Participar e votar em assembleias virtuais',
       'Convocar assembleias e cadastrar pautas',
+      'Consultar documentos públicos (convenção, atas)',
+      'Upload e arquivamento de documentos oficiais',
       'Cadastrar e gerenciar contratos de fornecedores',
       'Acessar e editar cadastro de moradores e unidades'
     ]
@@ -45,11 +72,14 @@ const MOCK_PROFILES: RoleProfile[] = [
     description: 'Acesso gerencial amplo, controle financeiro, geração de cobranças e relatórios fiscais.',
     usersCount: 4,
     permissions: [
-      'Acesso a múltiplos condomínios da carteira',
+      'Visualizar avisos e confirmar leitura',
+      'Publicar, editar e fixar comunicados oficiais no mural',
+      'Criar pesquisas de opinião e exportar resultados',
       'Emissão e baixa de boletos condominiais',
-      'Upload de relatórios contábeis e prestação de contas',
-      'Importação em lote de cadastros de unidades',
-      'Gerenciamento de papéis e permissões de acesso'
+      'Publicar balancetes e demonstrativos fiscais',
+      'Upload e arquivamento de documentos oficiais',
+      'Cadastrar e gerenciar contratos de fornecedores',
+      'Acessar e editar cadastro de moradores e unidades'
     ]
   },
   {
@@ -58,14 +88,48 @@ const MOCK_PROFILES: RoleProfile[] = [
     description: 'Acompanhamento e auditoria de prestação de contas, orçamentos e contratos.',
     usersCount: 3,
     permissions: [
-      'Visualizar relatórios contábeis e fiscais completos',
-      'Auditar contratos e pagamentos a fornecedores',
-      'Emitir parecer consultivo nas contas da assembleia'
+      'Visualizar avisos e confirmar leitura',
+      'Visualizar boletos e extratos da sua unidade',
+      'Consultar documentos públicos (convenção, atas)',
+      'Publicar balancetes e demonstrativos fiscais'
     ]
   }
 ];
 
 export function AcessosView() {
+  const [profiles, setProfiles] = useState<RoleProfile[]>(MOCK_PROFILES);
+  const [editingProfile, setEditingProfile] = useState<RoleProfile | null>(null);
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+  const { showToast } = useToast();
+
+  const handleOpenEdit = (profile: RoleProfile) => {
+    setEditingProfile(profile);
+    setSelectedPermissions([...profile.permissions]);
+  };
+
+  const handleTogglePermission = (perm: string) => {
+    if (selectedPermissions.includes(perm)) {
+      setSelectedPermissions(selectedPermissions.filter(p => p !== perm));
+    } else {
+      setSelectedPermissions([...selectedPermissions, perm]);
+    }
+  };
+
+  const handleSavePermissions = () => {
+    if (!editingProfile) return;
+
+    setProfiles(prev => prev.map(p => {
+      if (p.id !== editingProfile.id) return p;
+      return {
+        ...p,
+        permissions: selectedPermissions
+      };
+    }));
+
+    setEditingProfile(null);
+    showToast(`Permissões do perfil "${editingProfile.name}" atualizadas!`, 'success');
+  };
+
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -73,15 +137,12 @@ export function AcessosView() {
           <h2 className="text-2xl font-bold flex items-center gap-2 text-content">
             <Shield className="text-primary" size={24} /> Hierarquia de Acessos
           </h2>
-          <p className="text-content-muted mt-1">Perfis de usuários, níveis de permissão e segurança</p>
+          <p className="text-content-muted mt-1">Perfis de usuários oficiais, matriz de papéis e segurança do sistema</p>
         </div>
-        <Button size="sm">
-          + Criar novo perfil
-        </Button>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {MOCK_PROFILES.map(profile => (
+        {profiles.map(profile => (
           <Card key={profile.id} className="flex flex-col justify-between">
             <div className="p-5 space-y-3">
               <div className="flex items-center justify-between">
@@ -101,7 +162,7 @@ export function AcessosView() {
               </p>
 
               <div className="pt-3 border-t border-border-subtle space-y-1.5">
-                <p className="text-[11px] font-bold text-content uppercase tracking-wider">Permissões inclusas:</p>
+                <p className="text-[11px] font-bold text-content uppercase tracking-wider">Permissões ativas:</p>
                 <div className="space-y-1">
                   {profile.permissions.map((perm, idx) => (
                     <div key={idx} className="flex items-center gap-2 text-xs text-content">
@@ -115,15 +176,59 @@ export function AcessosView() {
 
             <div className="p-3.5 bg-surface-subtle border-t border-border-subtle flex justify-between items-center">
               <span className="text-xs text-content-muted flex items-center gap-1">
-                <ShieldCheck size={14} className="text-primary" /> Perfil ativo
+                <Lock size={14} className="text-primary" /> Perfil nativo
               </span>
-              <Button variant="outline" size="sm" className="text-xs">
+              <Button variant="outline" size="sm" onClick={() => handleOpenEdit(profile)} className="text-xs">
                 Editar permissões
               </Button>
             </div>
           </Card>
         ))}
       </div>
+
+      {/* Modal de Edição de Permissões */}
+      <Modal
+        isOpen={Boolean(editingProfile)}
+        onClose={() => setEditingProfile(null)}
+        title={`Permissões: ${editingProfile?.name}`}
+        description="Ative ou desative os privilégios operacionais deste perfil."
+      >
+        <div className="space-y-4">
+          <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+            {ALL_AVAILABLE_PERMISSIONS.map(perm => {
+              const isChecked = selectedPermissions.includes(perm);
+              return (
+                <label
+                  key={perm}
+                  onClick={() => handleTogglePermission(perm)}
+                  className={`flex items-center gap-3 p-2.5 rounded-lg border text-xs cursor-pointer transition-colors ${
+                    isChecked
+                      ? 'bg-primary/5 border-primary/40 text-content font-medium'
+                      : 'bg-surface border-border-subtle text-content-muted hover:bg-surface-subtle'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => {}} // tratado no onClick do label
+                    className="w-4 h-4 rounded text-primary focus:ring-primary/20 border-border-subtle"
+                  />
+                  <span>{perm}</span>
+                </label>
+              );
+            })}
+          </div>
+
+          <div className="pt-3 border-t border-border-subtle flex justify-end gap-2">
+            <Button variant="outline" size="sm" onClick={() => setEditingProfile(null)}>
+              Cancelar
+            </Button>
+            <Button size="sm" onClick={handleSavePermissions}>
+              Salvar alterações
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </motion.div>
   );
 }

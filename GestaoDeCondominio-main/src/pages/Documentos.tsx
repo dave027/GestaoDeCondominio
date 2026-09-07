@@ -1,6 +1,8 @@
 import { motion } from 'motion/react';
 import { Card, Button } from '../components/ui';
-import { Folder, FileText, Download, Search, Tag, Eye } from 'lucide-react';
+import { Modal } from '../components/Modal';
+import { useToast } from '../components/Toast';
+import { Folder, FileText, Download, Search, Tag, Eye, Plus, UploadCloud } from 'lucide-react';
 import { useState } from 'react';
 
 interface DocItem {
@@ -64,16 +66,51 @@ const MOCK_DOCS: DocItem[] = [
 ];
 
 export function DocumentosView() {
+  const [docs, setDocs] = useState<DocItem[]>(MOCK_DOCS);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string>('Todas');
+  const [previewDoc, setPreviewDoc] = useState<DocItem | null>(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const { showToast } = useToast();
+
+  // Restrição: Apenas Síndico e Administradora podem fazer upload de novos documentos
+  const userRole: 'sindico' | 'administradora' | 'morador' = 'sindico';
+
+  const [newDoc, setNewDoc] = useState({
+    title: '',
+    category: 'Convenção e Regimento' as DocItem['category'],
+    version: 'v1.0'
+  });
 
   const categories = ['Todas', 'Convenção e Regimento', 'Atas de Assembleia', 'Prestação de Contas', 'Contratos', 'Laudos'];
 
-  const filteredDocs = MOCK_DOCS.filter(doc => {
+  const filteredDocs = docs.filter(doc => {
     const matchesSearch = doc.title.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = category === 'Todas' || doc.category === category;
     return matchesSearch && matchesCategory;
   });
+
+  const handleUpload = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newDoc.title.trim()) {
+      showToast('Informe o título do documento', 'error');
+      return;
+    }
+
+    const item: DocItem = {
+      id: Date.now().toString(),
+      title: newDoc.title,
+      category: newDoc.category,
+      fileSize: '1.2 MB',
+      updatedAt: new Date().toLocaleDateString('pt-BR'),
+      version: newDoc.version || 'v1.0'
+    };
+
+    setDocs([item, ...docs]);
+    setIsUploadModalOpen(false);
+    setNewDoc({ title: '', category: 'Convenção e Regimento', version: 'v1.0' });
+    showToast('Documento oficial arquivado e publicado com sucesso!', 'success');
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
@@ -84,6 +121,13 @@ export function DocumentosView() {
           </h2>
           <p className="text-content-muted mt-1">Documentos oficiais, atas, regimento e relatórios</p>
         </div>
+
+        {/* Botão visível exclusivamente para Síndico e Administradora conforme exigido */}
+        {(userRole === 'sindico' || userRole === 'administradora') && (
+          <Button size="sm" onClick={() => setIsUploadModalOpen(true)} className="gap-1.5 self-start sm:self-auto">
+            <Plus size={16} /> Adicionar documento
+          </Button>
+        )}
       </header>
 
       {/* Busca e Filtros */}
@@ -141,23 +185,120 @@ export function DocumentosView() {
               </div>
 
               <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-                <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
+                <Button variant="ghost" size="sm" onClick={() => setPreviewDoc(doc)} className="gap-1.5 text-xs">
                   <Eye size={14} /> Pré-visualizar
                 </Button>
-                <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => showToast(`Download do arquivo "${doc.title}.pdf" iniciado!`, 'info')}
+                  className="gap-1.5 text-xs"
+                >
                   <Download size={14} /> Baixar
                 </Button>
               </div>
             </div>
           </Card>
         ))}
+      </div>
 
-        {filteredDocs.length === 0 && (
-          <div className="p-8 text-center text-content-muted text-sm bg-surface rounded-lg border border-dashed border-border-subtle">
-            Nenhum documento encontrado para os filtros selecionados.
+      {/* Modal de Pré-visualização de Documento */}
+      <Modal
+        isOpen={Boolean(previewDoc)}
+        onClose={() => setPreviewDoc(null)}
+        title={previewDoc?.title || 'Visualização do Documento'}
+        description={`Categoria: ${previewDoc?.category} • Versão ${previewDoc?.version}`}
+        maxWidth="lg"
+      >
+        {previewDoc && (
+          <div className="space-y-4">
+            <div className="p-6 bg-surface-subtle border border-border-subtle rounded-lg text-xs leading-relaxed space-y-3 font-mono">
+              <div className="flex justify-between items-center border-b pb-2 text-content">
+                <span className="font-bold">ARQUIVO OFICIAL CERTIFICADO</span>
+                <span>{previewDoc.updatedAt}</span>
+              </div>
+              <p className="font-semibold text-sm text-content">{previewDoc.title}</p>
+              <p>Este documento faz parte do repositório oficial do condomínio e possui validade jurídica para todos os moradores e gestores.</p>
+              <p className="text-content-muted">Tamanho do arquivo original: {previewDoc.fileSize}. Todas as revisões anteriores encontram-se no histórico de versionamento.</p>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => setPreviewDoc(null)}>Fechar</Button>
+              <Button size="sm" onClick={() => {
+                showToast(`Download de "${previewDoc.title}" iniciado!`, 'success');
+                setPreviewDoc(null);
+              }}>
+                <Download size={14} className="mr-1" /> Baixar arquivo original
+              </Button>
+            </div>
           </div>
         )}
-      </div>
+      </Modal>
+
+      {/* Modal de Upload de Documento (Apenas Síndico / Admin) */}
+      <Modal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        title="Adicionar Novo Documento Oficial"
+        description="Publique convenções, atas, contratos ou laudos para consulta dos condôminos."
+      >
+        <form onSubmit={handleUpload} className="space-y-4">
+          <div>
+            <label className="text-xs font-medium text-content block mb-1">Título do documento *</label>
+            <input
+              type="text"
+              required
+              placeholder="Ex: Laudo Técnico de Estanqueidade do Gás"
+              value={newDoc.title}
+              onChange={e => setNewDoc({ ...newDoc, title: e.target.value })}
+              className="w-full px-3 py-2 text-sm bg-surface border border-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 text-content"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-medium text-content block mb-1">Categoria *</label>
+              <select
+                value={newDoc.category}
+                onChange={e => setNewDoc({ ...newDoc, category: e.target.value as DocItem['category'] })}
+                className="w-full px-3 py-2 text-sm bg-surface border border-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 text-content"
+              >
+                <option value="Convenção e Regimento">Convenção e Regimento</option>
+                <option value="Atas de Assembleia">Atas de Assembleia</option>
+                <option value="Prestação de Contas">Prestação de Contas</option>
+                <option value="Contratos">Contratos</option>
+                <option value="Laudos">Laudos</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-content block mb-1">Versão</label>
+              <input
+                type="text"
+                placeholder="v1.0"
+                value={newDoc.version}
+                onChange={e => setNewDoc({ ...newDoc, version: e.target.value })}
+                className="w-full px-3 py-2 text-sm bg-surface border border-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 text-content"
+              />
+            </div>
+          </div>
+
+          <div className="p-6 border-2 border-dashed border-border-subtle rounded-lg text-center bg-surface-subtle space-y-2 cursor-pointer hover:border-primary/50 transition-colors">
+            <UploadCloud size={32} className="mx-auto text-content-muted" />
+            <p className="text-xs font-semibold text-content">Arraste o arquivo PDF aqui ou clique para selecionar</p>
+            <p className="text-[11px] text-content-muted">Formatos permitidos: PDF, DOCX (até 25 MB)</p>
+          </div>
+
+          <div className="pt-3 border-t border-border-subtle flex justify-end gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => setIsUploadModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button type="submit" size="sm">
+              Concluir publicação
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </motion.div>
   );
 }
